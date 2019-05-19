@@ -1,5 +1,7 @@
-use clap::{App, Arg, SubCommand, values_t_or_exit};
+use clap::{App, Arg, SubCommand, values_t_or_exit, value_t_or_exit};
+
 fn main() {
+    let default = &(100_000_000).to_string()[..];
     let m = App::new("nth primes")
                 .about("identity hunting")
                 .subcommand(SubCommand::with_name("from")
@@ -10,13 +12,36 @@ fn main() {
                         .required(false))
                     .arg(Arg::with_name("range")
                         .required(true)
-                        .help("from zero if one value, between if two")
+                        .help("return primes in this range")
                         .multiple(true)
-                        .number_of_values(2))).get_matches();
-    println!("Hello, world!");
+                        .number_of_values(2)))
+                .subcommand(SubCommand::with_name("nth")
+                    .alias("n")
+                    .arg(Arg::with_name("index")
+                        .help("nth prime to print")
+                        .required(true))
+                    .arg(Arg::with_name("max")
+                        .required(false)
+                        .help("limit for prime search")
+                        .number_of_values(1)
+                        .default_value(default)))
+                .get_matches();
     if let Some(matches) = m.subcommand_matches("from") {
         let range = values_t_or_exit!(matches.values_of("range"), usize);
         print_primes(range, matches.is_present("index"));
+    }
+    if let Some(matches) = m.subcommand_matches("nth") {
+        let nth = value_t_or_exit!(matches.value_of("index"), usize);
+        let max = value_t_or_exit!(matches.value_of("max"), usize);
+        print_nth_prime(nth, max);
+        //let range = values_t_or_exit!(matches.values_of("range"), usize);
+        //print_primes(range, matches.is_present("index"));
+    }
+}
+fn print_nth_prime(nth: usize, upper: usize) -> () {
+    for (_, prime) in fetch_primes(upper).into_iter().enumerate()
+        .filter(|(idx, _)| idx == &nth) {
+            println!("{}", prime);
     }
 }
 

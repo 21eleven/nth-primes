@@ -1,7 +1,8 @@
 use clap::{App, Arg, SubCommand, values_t_or_exit, value_t_or_exit};
 
 fn main() {
-    let default = &(100_000_000).to_string()[..];
+    //let default = &(100_000_000).to_string()[..];
+    let default = &(25_000_000).to_string()[..];
     let m = App::new("nth primes")
                 .about("identity hunting")
                 .subcommand(SubCommand::with_name("from")
